@@ -1,0 +1,25 @@
+retry: 30000
+id: 991951325
+event: ping
+data: 
+
+event: state
+data: {"id":"sensor-house_-_wifi_signal","state":"-55 dBm","value":-55}
+
+event: state
+data: {"id":"sensor-house_-_power_consumption","state":"2680 W","value":2680.167}
+
+event: state
+data: {"id":"sensor-house_-_total_energy","state":"256.170 kWh","value":256.17}
+
+event: state
+data: {"id":"sensor-house_-_daily_energy","state":"11.472 kWh","value":11.47162}
+
+event: state
+data: {"id":"text_sensor-house_-_esphome_version","state":"2022.2.5","value":"2022.2.5"}
+
+event: state
+data: {"id":"text_sensor-house_-_ip_address","state":"192.168.x.y","value":"192.168.x.y"}
+
+event: state
+data: {"id":"text_sensor-house_-_connected_ssid","state":"wifiSSIDHere","value":"wifiSSIDHere"}
