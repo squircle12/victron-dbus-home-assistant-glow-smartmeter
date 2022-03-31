@@ -1,14 +1,15 @@
-# dbus-shelly-3em-smartmeter
-Integrate Shelly 3EM smart meter into [Victron Energies Venus OS](https://github.com/victronenergy/venus)
+# victron-dbus-home-assistant-glow-smartmeter
+Integrate Home Assistant's Glow meter into [Victron Energies Venus OS](https://github.com/victronenergy/venus). Originally forked from @fabian-lauer, there will be a lot of references of the EM3 in earlier commits of this main branch until a basic working edition is sorted
 
 ## Purpose
 With the scripts in this repo it should be easy possible to install, uninstall, restart a service that connects the Shelly 3EM to the VenusOS and GX devices from Victron.
-Idea is pasend on @RalfZim project linked below.
+Idea was originally passed on @RalfZim project linked below, but I've forked it from @fabian-lauer project linked below. 
 
 
 
 ## Inspiration
 This project is my first on GitHub and with the Victron Venus OS, so I took some ideas and approaches from the following projects - many thanks for sharing the knowledge:
+- https://github.com/fabian-lauer/dbus-shelly-3em-smartmeter 
 - https://github.com/RalfZim/venus.dbus-fronius-smartmeter
 - https://github.com/victronenergy/dbus-smappee
 - https://github.com/Louisvdw/dbus-serialbattery
@@ -18,14 +19,13 @@ This project is my first on GitHub and with the Victron Venus OS, so I took some
 
 ## How it works
 ### My setup
-- Shelly 3EM with latest firmware (20220209-094824/v1.11.8-g8c7bb8d)
+- Home Assistant Glow Meter
   - 3-Phase installation (normal for Germany)
-  - Connected to Wifi netowrk "A"
-  - IP 192.168.2.108/24  
+  - Connected to Wifi network "A"
+
 - Victron Energy Cerbo GX with Venus OS - Firmware v2.84
-  - No other devices from Victron connected (still waiting for shipment of Multiplus-2)
-  - Connected to Wifi netowrk "A"
-  - IP 192.168.2.110/24
+  - Victron Multiplus running latest firmware and latest ESS Assistant
+  - Connected to Wifi network "A"
 
 ### Details / Process
 As mentioned above the script is inspired by @RalfZim fronius smartmeter implementation.
