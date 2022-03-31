@@ -32,8 +32,9 @@ As mentioned above the script is inspired by @RalfZim fronius smartmeter impleme
 So what is the script doing:
 - Running as a service
 - connecting to DBus of the Venus OS `com.victronenergy.grid.http_40`
-- After successful DBus connection Shelly 3EM is accessed via REST-API - simply the /status is called and a JSON is returned with all details
-  A sample JSON file from Shelly 3EM can be found [here](docs/shelly3em-status-sample.json)
+- After successful DBus connection the Glow is accessed via the Event Source API - simply the /events is called and a realtime log is returned with all details
+- A sample log file from a glow can be found [here](docs/espHomeEventSourceExample.log)
+- (A sample JSON file from Shelly 3EM can be found [here](docs/shelly3em-status-sample.json))
 - Serial/MAC is taken from the response as device serial
 - Paths are added to the DBus with default value 0 - including some settings like name, etc
 - After that a "loop" is started which pulls Shelly 3EM data every 750ms from the REST-API and updates the values in the DBus
@@ -56,17 +57,17 @@ After that call the install.sh script.
 
 The following script should do everything for you:
 ```
-wget https://github.com/fabian-lauer/dbus-shelly-3em-smartmeter/archive/refs/heads/main.zip
-unzip main.zip "dbus-shelly-3em-smartmeter-main/*" -d /data
-mv /data/dbus-shelly-3em-smartmeter-main /data/dbus-shelly-3em-smartmeter
-chmod a+x /data/dbus-shelly-3em-smartmeter/install.sh
-/data/dbus-shelly-3em-smartmeter/install.sh
+wget https://github.com/squircle12/victron-dbus-home-assistant-glow-smartmeter/archive/refs/heads/main.zip
+unzip main.zip "victron-dbus-home-assistant-glow-smartmeter/*" -d /data
+mv /data/victron-dbus-home-assistant-glow-smartmeter /data/victron-dbus-home-assistant-glow-smartmeter
+chmod a+x /data/victron-dbus-home-assistant-glow-smartmeter/install.sh
+/data/victron-dbus-home-assistant-glow-smartmeter/install.sh
 rm main.zip
 ```
 ⚠️ Check configuration after that - because service is already installed an running and with wrong connection data (host, username, pwd) you will spam the log-file
 
 ### Change config.ini
-Within the project there is a file `/data/dbus-shelly-3em-smartmeter/config.ini` - just change the values - most important is the host, username and password in section "ONPREMISE". More details below:
+Within the project there is a file `/data/victron-dbus-home-assistant-glow-smartmeter/config.ini` - just change the values - most important is the host, username and password in section "ONPREMISE". More details below:
 
 | Section  | Config vlaue | Explanation |
 | ------------- | ------------- | ------------- |
