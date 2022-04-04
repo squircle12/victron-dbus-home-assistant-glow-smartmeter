@@ -1,19 +1,19 @@
 #!/bin/bash
 
 # set permissions for script files
-chmod a+x /data/dbus-shelly-3em-smartmeter/restart.sh
-chmod 744 /data/dbus-shelly-3em-smartmeter/restart.sh
+chmod a+x /data/dbus-glow-smartmeter/restart.sh
+chmod 744 /data/dbus-glow-smartmeter/restart.sh
 
-chmod a+x /data/dbus-shelly-3em-smartmeter/uninstall.sh
-chmod 744 /data/dbus-shelly-3em-smartmeter/uninstall.sh
+chmod a+x /data/dbus-glow-smartmeter/uninstall.sh
+chmod 744 /data/dbus-glow-smartmeter/uninstall.sh
 
-chmod a+x /data/dbus-shelly-3em-smartmeter/service/run
-chmod 755 /data/dbus-shelly-3em-smartmeter/service/run
+chmod a+x /data/dbus-glow-smartmeter/service/run
+chmod 755 /data/dbus-glow-smartmeter/service/run
 
 
 
 # create sym-link to run script in deamon
-ln -s /data/dbus-shelly-3em-smartmeter/service /service/dbus-shelly-3em-smartmeter
+ln -s /data/dbus-glow-smartmeter/service /service/dbus-glow-smartmeter
 
 
 
@@ -27,4 +27,4 @@ then
     echo >> $filename
 fi
 
-grep -qxF '/data/dbus-shelly-3em-smartmeter/install.sh' $filename || echo '/data/dbus-shelly-3em-smartmeter/install.sh' >> $filename
+grep -qxF '/data/dbus-glow-smartmeter/install.sh' $filename || echo '/data/dbus-glow-smartmeter/install.sh' >> $filename

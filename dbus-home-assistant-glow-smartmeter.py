@@ -5,11 +5,11 @@ import platform
 import logging
 import sys
 import os
-import sys
+import sys 
 if sys.version_info.major == 2:
-    import gobject
+   import gobject
 else:
-    from gi.repository import GLib as gobject
+   from gi.repository import GLib as gobject
 import sys
 import time
 import requests # for http GET
@@ -18,10 +18,10 @@ import configparser # for config/ini file
 # our own packages from victron
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), '/opt/victronenergy/dbus-systemcalc-py/ext/velib_python'))
 from vedbus import VeDbusService
+from requests.auth import HTTPDigestAuth
 
-
-class DbusShelly3emService:
-  def __init__(self, servicename, deviceinstance, paths, productname='HA Glow', connection='Home Assistant Glow HTTP Events Log service'):
+class DbusHAGlowService:
+  def __init__(self, servicename, deviceinstance, paths, productname='HA Glow', connection='Home Assistant Glow REST API'):
     self._dbusservice = VeDbusService("{}.http_{:02d}".format(servicename, deviceinstance))
     self._paths = paths
  
@@ -36,8 +36,8 @@ class DbusShelly3emService:
     self._dbusservice.add_path('/DeviceInstance', deviceinstance)
     #self._dbusservice.add_path('/ProductId', 16) # value used in ac_sensor_bridge.cpp of dbus-cgwacs
     #self._dbusservice.add_path('/ProductId', 0xFFFF) # id assigned by Victron Support from SDM630v2.py
-    self._dbusservice.add_path('/ProductId', 45069) # found on https://www.sascha-curth.de/projekte/005_Color_Control_GX.html#experiment - should be an ET340 Engerie Meter
-    self._dbusservice.add_path('/DeviceType', 345) # found on https://www.sascha-curth.de/projekte/005_Color_Control_GX.html#experiment - should be an ET340 Engerie Meter
+    self._dbusservice.add_path('/ProductId', 0xFFFF) # found on https://www.sascha-curth.de/projekte/005_Color_Control_GX.html#experiment - should be an ET340 Engerie Meter
+    self._dbusservice.add_path('/DeviceType', 339) # found on https://www.sascha-curth.de/projekte/005_Color_Control_GX.html#experiment - should be an ET340 Engerie Meter
     self._dbusservice.add_path('/ProductName', productname)
     self._dbusservice.add_path('/CustomName', productname)    
     self._dbusservice.add_path('/Latency', None)    
@@ -46,7 +46,7 @@ class DbusShelly3emService:
     self._dbusservice.add_path('/Connected', 1)
     self._dbusservice.add_path('/Role', 'grid')
     self._dbusservice.add_path('/Position', 0) # normaly only needed for pvinverter
-    self._dbusservice.add_path('/Serial', self._getShellySerial())
+    self._dbusservice.add_path('/Serial', self._getGlowSerial())
     self._dbusservice.add_path('/UpdateIndex', 0)
  
     # add path values to dbus
@@ -63,13 +63,13 @@ class DbusShelly3emService:
     # add _signOfLife 'timer' to get feedback in log every 5minutes
     gobject.timeout_add(self._getSignOfLifeInterval()*60*1000, self._signOfLife)
  
-  def _getShellySerial(self):
-    meter_data = self._getShellyData()  
+  def _getGlowSerial(self):
+    meter_data = self._getGlowData()  
     
-    if not meter_data['mac']:
-        raise ValueError("Response does not contain 'mac' attribute")
+    if not meter_data['id']:
+        raise ValueError("Response does not contain 'id' attribute")
     
-    serial = meter_data['mac']
+    serial = meter_data['id']
     return serial
  
  
@@ -89,28 +89,52 @@ class DbusShelly3emService:
     return int(value)
   
   
-  def _getShellyStatusUrl(self):
+  def _getPowerStatusUrl(self):
     config = self._getConfig()
     accessType = config['DEFAULT']['AccessType']
     
     if accessType == 'OnPremise': 
-        URL = "http://%s/events" % (config['ONPREMISE']['Host'])
+        URL = "http://%s/sensor/%s" % (config['ONPREMISE']['Host'],config['ONPREMISE']['PowerID'])
         URL = URL.replace(":@", "")
     else:
         raise ValueError("AccessType %s is not supported" % (config['DEFAULT']['AccessType']))
     
     return URL
-    
- 
-  def _getShellyData(self):
-    URL = self._getShellyStatusUrl()
-    meter_r = requests.get(url = URL)
+  def _getEnergyStatusUrl(self):
+    config = self._getConfig()
+    accessType = config['DEFAULT']['AccessType']
+   
+    if accessType == 'OnPremise': 
+        URL = "http://%s/sensor/%s" % (config['ONPREMISE']['Host'],config['ONPREMISE']['EnergyID'])
+        URL = URL.replace(":@", "")
+    else:
+        raise ValueError("AccessType %s is not supported" % (config['DEFAULT']['AccessType']))
+   
+    return URL 
+  def _getGlowData(self):
+    config = self._getConfig()
+      
+    URL = self._getPowerStatusUrl()
+    meter_power = requests.get(url = URL, auth=HTTPDigestAuth(config['ONPREMISE']['Username'],config['ONPREMISE']['Password']))
     
     # check for response
-    if not meter_r:
+    if not meter_power:
         raise ConnectionError("No response from Glow - %s" % (URL))
     
-    meter_data = meter_r.json()     
+    meter_data = meter_power.json()  
+    powerLevel = meter_data['value']
+
+      
+    URL = self._getEnergyStatusUrl()
+    meter_energy = requests.get(url = URL, auth=HTTPDigestAuth(config['ONPREMISE']['Username'],config['ONPREMISE']['Password']))
+    
+    # check for response
+    if not meter_energy:
+        raise ConnectionError("No response from Glow - %s" % (URL))
+    
+    meter_data = meter_energy.json()
+    meter_data['Energy'] = meter_data['value']
+    meter_data['Power'] = powerLevel
     
     # check for Json
     if not meter_data:
@@ -130,15 +154,13 @@ class DbusShelly3emService:
   def _update(self):   
     try:
        #get data from Glow
-       meter_data = self._getShellyData()
+       meter_data = self._getGlowData()
        
        #send data to DBus
-       self._dbusservice['/Ac/Power'] = meter_data['total_power'] # positive: consumption, negative: feed into grid
-       self._dbusservice['/Ac/L1/Voltage'] = meter_data['emeters'][0]['voltage']
-       self._dbusservice['/Ac/L1/Current'] = meter_data['emeters'][0]['current']
-       self._dbusservice['/Ac/L1/Power'] = meter_data['emeters'][0]['power']
-       self._dbusservice['/Ac/L1/Energy/Forward'] = (meter_data['emeters'][0]['total']/1000)
-       self._dbusservice['/Ac/L1/Energy/Reverse'] = (meter_data['emeters'][0]['total_returned']/1000) 
+       self._dbusservice['/Ac/Power'] = meter_data['Power'] # positive: consumption, negative: feed into grid
+       self._dbusservice['/Ac/L1/Power'] = meter_data['Power']
+       self._dbusservice['/Ac/L1/Energy/Forward'] = meter_data['Energy']
+       self._dbusservice['/Ac/L1/Energy/Reverse'] = 0
        self._dbusservice['/Ac/Energy/Forward'] = self._dbusservice['/Ac/L1/Energy/Forward']
        self._dbusservice['/Ac/Energy/Reverse'] = self._dbusservice['/Ac/L1/Energy/Reverse']
        
@@ -192,7 +214,7 @@ def main():
       _v = lambda p, v: (str(round(v, 1)) + ' V')   
      
       #start our main-service
-      pvac_output = DbusShelly3emService(
+      pvac_output = DbusHAGlowService(
         servicename='com.victronenergy.grid',
         deviceinstance=40,
         paths={
