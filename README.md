@@ -42,10 +42,10 @@ So what is the script doing:
 Thats it 😄
 
 ### Pictures
-![Tile Overview](img/venus-os-tile-overview.PNG)
-![Remote Console - Overview](img/venus-os-remote-console-overview.PNG) 
-![SmartMeter - Values](img/venus-os-shelly3em-smartmeter.PNG)
-![SmartMeter - Device Details](img/venus-os-shelly3em-smartmeter-devicedetails.PNG)
+![Tile Overview](img/venus-os-tile-overview-screen.png)
+![Remote Console - Overview](img/ha-glow-device-list.png) 
+![SmartMeter - Values](img/ha-glow-device-overview.png)
+![SmartMeter - Device Details](img/ha-glow-device-details.png)
 
 
 
