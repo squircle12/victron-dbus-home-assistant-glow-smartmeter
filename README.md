@@ -81,7 +81,7 @@ Within the project there is a file `/data/victron-dbus-home-assistant-glow-smart
 This plugin is rough! but it works at its core - and to be honest I'm quite happy with what its doing right now. However if I have time/inclination, it could also do with the following tweaks: 
 - 3 Phase to Single Phase conversion, unlike the plugin this is based from, UK residential homes are primarily single phase - so this plugin shows L2/L3 but are blank. despite some cursory looks at the victron source code, I cant track down a productID for the ET112 which would be better suited to this meter type. Still, doesnt seem to break it running on a single phase only.
 
-##What will never be fixed
+## What will never be fixed
 Some stuff just cant be fixed as all we are doing it looking at a blinking light! So we do not have access to thing such as current and voltage. Of course, you could judge lie, and put 242v in as an example but that would purely be asthetics. 
 
 ## Used documentation
