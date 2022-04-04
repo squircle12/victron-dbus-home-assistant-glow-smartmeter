@@ -76,6 +76,11 @@ Within the project there is a file `/data/victron-dbus-home-assistant-glow-smart
 | ONPREMISE  | Host | IP or hostname of on-premise Shelly 3EM web-interface |
 | ONPREMISE  | Username | Username for htaccess login - leave blank if no username/password required |
 | ONPREMISE  | Password | Password for htaccess login - leave blank if no username/password required |
+| ONPREMISE  | PowerID | the url to fetch the state of the power consumption state |
+| ONPREMISE  | EnergyID | the url to fetch the state of the total energy consumed |
+
+## How to fetch the URL for the PowerID and EnergyID
+This is most easily fetched by using the esphomes' default event source API which you can do by loading the url http://your.glows.ip.address.here/events you will get a bunch of text similar to what is linked [here](docs/espHomeEventSourceExample.log) and you will notice the 'sensor' lines that are suffixed with '-_power_consumption' you would use this as the PowerID and EnergyID urls for fetching the correct values from the system, minus the prefixed 'sensor-' header. eg 'sensor-house_-_power_consumption' becomes 'house_-_power_consumption'
 
 ## To do
 This plugin is rough! but it works at its core - and to be honest I'm quite happy with what its doing right now. However if I have time/inclination, it could also do with the following tweaks: 
